@@ -2,11 +2,41 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(cors());
 
+const DATA_FILE = path.join(__dirname, 'children.json');
+
+// Load Data
+let childrenData = {};
+if (fs.existsSync(DATA_FILE)) {
+  try {
+    childrenData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+    // Reset status and socket IDs on restart
+    for (let id in childrenData) {
+      childrenData[id].parentSocketId = null;
+      childrenData[id].childSocketId = null;
+      childrenData[id].status = 'Offline';
+    }
+    console.log('Loaded persisted data from children.json');
+  } catch (e) {
+    console.error('Error loading children.json:', e);
+  }
+}
+
+const saveToDisk = () => {
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(childrenData, null, 2));
+  } catch (e) {
+    console.error('Error saving children.json:', e);
+  }
+};
+
 app.get('/', (req, res) => {
+
   const ids = Object.keys(childrenData);
   let html = `
     <html>
@@ -48,24 +78,28 @@ io.on('connection', (socket) => {
         name,
         device,
         parentSocketId: socket.id,
-        childSocketId: null,
-        isLocked: false,
-        status: 'Pending',
+        childSocketId: childrenData[cleanId] ? childrenData[cleanId].childSocketId : null,
+        isLocked: childrenData[cleanId] ? childrenData[cleanId].isLocked : false,
+        status: childrenData[cleanId] ? childrenData[cleanId].status : 'Pending',
         bannedKeywords: bannedKeywords || ['guns', 'drugs', 'porn', 'suicide']
      };
+     saveToDisk();
      console.log(`Parent ${socket.id} registered ID: ${cleanId}`);
      socket.join(cleanId);
   });
+
 
 
   socket.on('toggle-lock', ({ id, isLocked }) => {
      const cleanId = id.trim().toUpperCase();
      if(childrenData[cleanId]) {
        childrenData[cleanId].isLocked = isLocked;
+       saveToDisk();
        io.to(cleanId).emit('lock-status-changed', isLocked);
        console.log(`Parent toggled lock for ${cleanId} to ${isLocked}`);
      }
   });
+
 
 
   socket.on('child-link', (id) => {
@@ -91,9 +125,11 @@ io.on('connection', (socket) => {
      const cleanId = id.trim().toUpperCase();
      if(childrenData[cleanId]) {
         childrenData[cleanId].bannedKeywords = bannedKeywords;
+        saveToDisk();
         console.log(`Parent updated keywords for ID: ${cleanId}`);
      }
   });
+
 
 
   socket.on('perform-search', ({ id, keyword, timestamp }) => {
