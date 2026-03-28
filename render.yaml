@@ -15,11 +15,11 @@ services:
     staticPublishPath: dist
     rootDir: parenguard
     envVars:
-      - key: VITE_BACKEND_URL
+      - key: VITE_BACKEND_HOST
         fromService:
           type: web
           name: suraksha-kawach-backend
-          property: url
+          property: host
     routes:
       - type: rewrite
         source: /*
@@ -33,11 +33,11 @@ services:
     staticPublishPath: dist
     rootDir: child-device-app
     envVars:
-      - key: VITE_BACKEND_URL
+      - key: VITE_BACKEND_HOST
         fromService:
           type: web
           name: suraksha-kawach-backend
-          property: url
+          property: host
     routes:
       - type: rewrite
         source: /*
