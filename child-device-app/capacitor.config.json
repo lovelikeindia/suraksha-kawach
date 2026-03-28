@@ -1,0 +1,5 @@
+{
+  "appId": "com.parental.control",
+  "appName": "child-device",
+  "webDir": "dist"
+}
