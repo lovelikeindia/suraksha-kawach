@@ -1,0 +1,44 @@
+services:
+  # The Node.js WebSocket Backend
+  - type: web
+    name: suraksha-kawach-backend
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    rootDir: parenguard-backend
+
+  # The Parent Dashboard App
+  - type: web
+    name: suraksha-kawach-parent
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    rootDir: parenguard
+    envVars:
+      - key: VITE_BACKEND_URL
+        fromService:
+          type: web
+          name: suraksha-kawach-backend
+          property: url
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # The Child App
+  - type: web
+    name: suraksha-kawach-child
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    rootDir: child-device-app
+    envVars:
+      - key: VITE_BACKEND_URL
+        fromService:
+          type: web
+          name: suraksha-kawach-backend
+          property: url
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
