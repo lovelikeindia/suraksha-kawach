@@ -7,8 +7,25 @@ const app = express();
 app.use(cors());
 
 app.get('/', (req, res) => {
-  res.send('Backend is running!');
+  const ids = Object.keys(childrenData);
+  let html = `
+    <html>
+      <head><title>Suraksha Kawach Status</title><style>body{font-family:sans-serif;padding:20px;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #ddd;padding:8px;text-align:left;}th{background-color:#f2f2f2;}</style></head>
+      <body>
+        <h1>Suraksha Kawach Backend</h1>
+        <p>Current Server Time: ${new Date().toLocaleTimeString()}</p>
+        <h2>Registered IDs: ${ids.length}</h2>
+        <table>
+          <tr><th>SK ID</th><th>Name</th><th>Device</th><th>Status</th></tr>
+          ${ids.map(id => `<tr><td>${id}</td><td>${childrenData[id].name}</td><td>${childrenData[id].device}</td><td>${childrenData[id].status}</td></tr>`).join('')}
+        </table>
+        <p><i>Note: Refresh the page to see live updates.</i></p>
+      </body>
+    </html>
+  `;
+  res.send(html);
 });
+
 
 
 const server = http.createServer(app);
