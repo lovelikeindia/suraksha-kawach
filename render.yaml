@@ -3,6 +3,7 @@ services:
   - type: web
     name: suraksha-kawach-backend
     env: node
+    plan: free
     buildCommand: npm install
     startCommand: npm start
     rootDir: parenguard-backend
@@ -11,6 +12,7 @@ services:
   - type: web
     name: suraksha-kawach-parent
     env: static
+    plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     rootDir: parenguard
@@ -29,6 +31,7 @@ services:
   - type: web
     name: suraksha-kawach-child
     env: static
+    plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     rootDir: child-device-app
