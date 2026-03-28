@@ -25,8 +25,12 @@ import {
 import { io } from 'socket.io-client';
 
 const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
-const BACKEND_URL = BACKEND_HOST ? `https://${BACKEND_HOST}` : 'http://localhost:3000';
+const BACKEND_URL = BACKEND_HOST 
+  ? (BACKEND_HOST.startsWith('http') ? BACKEND_HOST : `https://${BACKEND_HOST}`) 
+  : 'http://192.168.1.38:3000';
 const socket = io(BACKEND_URL);
+
+
 
 const App = () => {
   const [linkingCode, setLinkingCode] = useState('');
@@ -51,10 +55,16 @@ const App = () => {
     }
     
     socket.on('connect', () => {
+       console.log('Socket Connected to:', BACKEND_URL);
        const retryCode = localStorage.getItem('suraksha_child_id') || linkingCode;
        if (retryCode) {
           socket.emit('child-link', retryCode);
        }
+    });
+
+    socket.on('connect_error', (err) => {
+       console.error('Socket Connection Error:', err);
+       setError('Server se jud nahi pa rahe. Internet check karein.');
     });
 
     socket.on('link-success', ({ name, isLocked }) => {
@@ -75,11 +85,24 @@ const App = () => {
 
     return () => {
        socket.off('connect');
+       socket.off('connect_error');
        socket.off('link-success');
        socket.off('link-error');
        socket.off('lock-status-changed');
     };
   }, [linkingCode]);
+
+  useEffect(() => {
+    let timeout;
+    if (isLinking) {
+       timeout = setTimeout(() => {
+          setIsLinking(false);
+          setError('Response nahi mila. Kya Parent App khula hai?');
+       }, 10000);
+    }
+    return () => clearTimeout(timeout);
+  }, [isLinking]);
+
 
   const handleLinkDevice = (e) => {
     e.preventDefault();
