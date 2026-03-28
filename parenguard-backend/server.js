@@ -67,7 +67,8 @@ const io = new Server(server, {
   }
 });
 
-const childrenData = {};
+
+
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
@@ -141,14 +142,15 @@ io.on('connection', (socket) => {
 
 
         const lowerKeyword = keyword.toLowerCase();
-        const isBad = (childrenData[id].bannedKeywords || []).some(bad => lowerKeyword.includes(bad.toLowerCase()));
+        const isBad = (childrenData[cleanId].bannedKeywords || []).some(bad => lowerKeyword.includes(bad.toLowerCase()));
         
         if(isBad) {
-           console.log(`Alert: Child ${id} searched for restricted keyword: ${keyword}`);
-           if(childrenData[id].parentSocketId) {
-              io.to(childrenData[id].parentSocketId).emit('search-alert', { id, keyword, timestamp });
+           console.log(`Alert: Child ${cleanId} searched for restricted keyword: ${keyword}`);
+           if(childrenData[cleanId].parentSocketId) {
+              io.to(childrenData[cleanId].parentSocketId).emit('search-alert', { id: cleanId, keyword, timestamp });
            }
         }
+
      }
   });
 
