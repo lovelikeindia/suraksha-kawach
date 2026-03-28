@@ -2,7 +2,7 @@ services:
   # The Node.js WebSocket Backend
   - type: web
     name: suraksha-kawach-backend
-    env: node
+    runtime: node
     plan: free
     buildCommand: npm install
     startCommand: npm start
@@ -11,16 +11,16 @@ services:
   # The Parent Dashboard App
   - type: web
     name: suraksha-kawach-parent
-    env: static
+    runtime: static
     buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    staticPublishPath: ./dist
     rootDir: parenguard
     envVars:
       - key: VITE_BACKEND_HOST
         fromService:
           type: web
           name: suraksha-kawach-backend
-          property: host
+          envVarKey: RENDER_EXTERNAL_URL
     routes:
       - type: rewrite
         source: /*
@@ -29,16 +29,16 @@ services:
   # The Child App
   - type: web
     name: suraksha-kawach-child
-    env: static
+    runtime: static
     buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    staticPublishPath: ./dist
     rootDir: child-device-app
     envVars:
       - key: VITE_BACKEND_HOST
         fromService:
           type: web
           name: suraksha-kawach-backend
-          property: host
+          envVarKey: RENDER_EXTERNAL_URL
     routes:
       - type: rewrite
         source: /*
