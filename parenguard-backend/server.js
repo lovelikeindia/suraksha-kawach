@@ -26,7 +26,8 @@ io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
   socket.on('parent-register', ({ id, name, device, bannedKeywords }) => {
-     childrenData[id] = {
+     const cleanId = id.trim().toUpperCase();
+     childrenData[cleanId] = {
         name,
         device,
         parentSocketId: socket.id,
@@ -35,45 +36,56 @@ io.on('connection', (socket) => {
         status: 'Pending',
         bannedKeywords: bannedKeywords || ['guns', 'drugs', 'porn', 'suicide']
      };
-     console.log(`Parent ${socket.id} created child ID ${id}`);
-     socket.join(id);
+     console.log(`Parent ${socket.id} registered ID: ${cleanId}`);
+     socket.join(cleanId);
   });
+
 
   socket.on('toggle-lock', ({ id, isLocked }) => {
-     if(childrenData[id]) {
-       childrenData[id].isLocked = isLocked;
-       io.to(id).emit('lock-status-changed', isLocked);
-       console.log(`Parent toggled lock for ${id} to ${isLocked}`);
+     const cleanId = id.trim().toUpperCase();
+     if(childrenData[cleanId]) {
+       childrenData[cleanId].isLocked = isLocked;
+       io.to(cleanId).emit('lock-status-changed', isLocked);
+       console.log(`Parent toggled lock for ${cleanId} to ${isLocked}`);
      }
   });
+
 
   socket.on('child-link', (id) => {
-     if(childrenData[id]) {
-       childrenData[id].childSocketId = socket.id;
-       childrenData[id].status = 'Online';
-       socket.join(id);
+     const cleanId = id.trim().toUpperCase();
+     console.log(`Child ${socket.id} attempting to link with ID: ${cleanId}`);
+     if(childrenData[cleanId]) {
+       childrenData[cleanId].childSocketId = socket.id;
+       childrenData[cleanId].status = 'Online';
+       socket.join(cleanId);
        
-       socket.emit('link-success', { name: childrenData[id].name, isLocked: childrenData[id].isLocked });
+       socket.emit('link-success', { name: childrenData[cleanId].name, isLocked: childrenData[cleanId].isLocked });
        
-       io.to(childrenData[id].parentSocketId).emit('child-status-changed', { id, status: 'Online' });
-       console.log(`Child ${socket.id} linked to ID ${id}`);
+       io.to(childrenData[cleanId].parentSocketId).emit('child-status-changed', { id: cleanId, status: 'Online' });
+       console.log(`Child linked successfully to ID: ${cleanId}`);
      } else {
-       socket.emit('link-error', 'Galat ID! Ye bacha register nai hai.');
+       console.log(`Link Error: ID ${cleanId} not found in database. Current IDs: ${Object.keys(childrenData).join(', ')}`);
+       socket.emit('link-error', 'Galat ID! Pehle Parent App mein register karein.');
      }
   });
+
 
   socket.on('update-keywords', ({ id, bannedKeywords }) => {
-     if(childrenData[id]) {
-        childrenData[id].bannedKeywords = bannedKeywords;
-        console.log(`Parent updated keywords for ID ${id}`);
+     const cleanId = id.trim().toUpperCase();
+     if(childrenData[cleanId]) {
+        childrenData[cleanId].bannedKeywords = bannedKeywords;
+        console.log(`Parent updated keywords for ID: ${cleanId}`);
      }
   });
 
+
   socket.on('perform-search', ({ id, keyword, timestamp }) => {
-     if(childrenData[id]) {
-        if(childrenData[id].parentSocketId) {
-           io.to(childrenData[id].parentSocketId).emit('incoming-activity-log', { id, app: 'Browser', detail: `Searched for: "${keyword}"`, timestamp });
+     const cleanId = id.trim().toUpperCase();
+     if(childrenData[cleanId]) {
+        if(childrenData[cleanId].parentSocketId) {
+           io.to(childrenData[cleanId].parentSocketId).emit('incoming-activity-log', { id: cleanId, app: 'Browser', detail: `Searched for: "${keyword}"`, timestamp });
         }
+
 
         const lowerKeyword = keyword.toLowerCase();
         const isBad = (childrenData[id].bannedKeywords || []).some(bad => lowerKeyword.includes(bad.toLowerCase()));
@@ -88,11 +100,13 @@ io.on('connection', (socket) => {
   });
 
   socket.on('track-activity', ({ id, app, detail, timestamp }) => {
-     if(childrenData[id]) {
-        console.log(`Activity [${app}]: Child ${id} is ${detail}`);
-        if(childrenData[id].parentSocketId) {
-           io.to(childrenData[id].parentSocketId).emit('incoming-activity-log', { id, app, detail, timestamp });
+     const cleanId = id.trim().toUpperCase();
+     if(childrenData[cleanId]) {
+        console.log(`Activity [${app}]: Child ${cleanId} is ${detail}`);
+        if(childrenData[cleanId].parentSocketId) {
+           io.to(childrenData[cleanId].parentSocketId).emit('incoming-activity-log', { id: cleanId, app, detail, timestamp });
         }
+
      }
   });
 
