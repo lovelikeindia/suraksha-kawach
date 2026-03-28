@@ -25,9 +25,16 @@ import {
 import { io } from 'socket.io-client';
 
 const BACKEND_HOST = import.meta.env.VITE_BACKEND_HOST;
-const BACKEND_URL = BACKEND_HOST 
-  ? (BACKEND_HOST.startsWith('http') ? BACKEND_HOST : `https://${BACKEND_HOST}`) 
-  : 'http://192.168.1.38:3000';
+const FORCED_RENDER_URL = 'https://suraksha-kawach-backend.onrender.com';
+
+const getBackendUrl = () => {
+  if (BACKEND_HOST) return BACKEND_HOST.startsWith('http') ? BACKEND_HOST : `https://${BACKEND_HOST}`;
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return 'http://192.168.1.38:3000';
+  return FORCED_RENDER_URL;
+};
+
+const BACKEND_URL = getBackendUrl();
+
 const socket = io(BACKEND_URL);
 
 
@@ -107,12 +114,13 @@ const App = () => {
   const handleLinkDevice = (e) => {
     e.preventDefault();
     
-    const isValidFormat = /^SK-\d{6}$/.test(linkingCode);
+    const isValidFormat = linkingCode.length >= 3; // Minimal check
 
     if (!isValidFormat) {
-      setError('Galat Code! Kripya sahi ID daliye (Jaise: SK-123456)');
+      setError('Kripya sahi ID daliye (Jaise: SK-123456)');
       return;
     }
+
     
     setError('');
     setIsLinking(true);
@@ -418,6 +426,25 @@ const App = () => {
                 'Jodna Shuru Karein'
               )}
             </button>
+            <div className="pt-2 text-center">
+               <button 
+                  type="button"
+                  onClick={async () => {
+                     setError('Checking connection...');
+                     try {
+                        const res = await fetch(BACKEND_URL + '/');
+                        if (res.ok) setError('Server mil gaya! Ab ID dalo.');
+                        else setError('Server link mil gayi par galat hai.');
+                     } catch(e) {
+                        setError('Server nahi mila. URL galat hai ya net band hai.');
+                     }
+                  }}
+                  className="text-xs font-bold text-indigo-400 hover:text-indigo-600 underline"
+               >
+                  Connect hai ya nahi check karein?
+               </button>
+            </div>
+
           </form>
 
           <div className="mt-8 text-center animate-in fade-in duration-500 delay-300">
