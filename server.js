@@ -36,7 +36,6 @@ const saveToDisk = () => {
 };
 
 app.get('/', (req, res) => {
-
   const ids = Object.keys(childrenData);
   let html = `
     <html>
@@ -66,8 +65,6 @@ const io = new Server(server, {
     methods: ["GET", "POST"]
   }
 });
-
-
 
 
 io.on('connection', (socket) => {
