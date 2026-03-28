@@ -35,7 +35,6 @@ const getBackendUrl = () => {
 };
 
 const BACKEND_URL = getBackendUrl();
-
 const socket = io(BACKEND_URL);
 
 
@@ -232,6 +231,14 @@ const App = () => {
               {socketConnected ? 'Server Online' : 'Server Offline'}
             </div>
           </div>
+          <button onClick={syncWithServer} title="Sync with Server" className="bg-indigo-600 p-1.5 rounded-lg hover:bg-indigo-500 transition-colors shadow-inner text-white flex items-center gap-1 px-3">
+            <Activity size={16} />
+            <span className="text-[10px] font-bold">Sync</span>
+          </button>
+          <button onClick={() => setShowAddModal(true)} className="bg-indigo-600 p-1.5 rounded-lg hover:bg-indigo-500 transition-colors shadow-inner text-white">
+            <Plus size={20} />
+          </button>
+
           <div className="relative">
             <AlertTriangle size={24} className="text-yellow-300 animate-pulse" />
           </div>
