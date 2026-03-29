@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Suraksha Kawach</string>
+    <string name="title_activity_main">Suraksha Kawach</string>
+    <string name="package_name">com.surakshaKawach.parent</string>
+    <string name="custom_url_scheme">com.surakshaKawach.parent</string>
+</resources>
