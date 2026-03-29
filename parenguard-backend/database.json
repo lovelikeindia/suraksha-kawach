@@ -1,0 +1,98 @@
+{
+   "parentAccounts": {
+      "9876543210": {
+         "name": "Testing Parent",
+         "mobile": "9876543210",
+         "pin": "1234",
+         "device": "Smart Phone",
+         "status": "Approved",
+         "socketId": "2r5qXJfhoqiw7HcNAABd"
+      }
+   },
+   "childrenData": {
+      "SK-492011": {
+         "name": "Aman",
+         "device": "Redmi Note 10",
+         "parentMobile": "9876543210",
+         "childSocketId": "mKQVKkNPQ_FYXnUeAABe",
+         "isLocked": false,
+         "status": "Online",
+         "bannedKeywords": [
+            "guns",
+            "drugs",
+            "porn",
+            "murder"
+         ],
+         "callLogs": [],
+         "activityLogs": []
+      },
+      "SK-539075": {
+         "name": "gggg",
+         "device": "Linking Pending...",
+         "parentMobile": "9876543210",
+         "childSocketId": null,
+         "isLocked": false,
+         "status": "Pending",
+         "bannedKeywords": [
+            "guns",
+            "drugs",
+            "porn",
+            "suicide",
+            "bomb"
+         ],
+         "callLogs": [],
+         "activityLogs": []
+      },
+      "SK-626835": {
+         "name": "Bacha 1",
+         "device": "Linking Pending...",
+         "parentMobile": "9876543210",
+         "childSocketId": null,
+         "isLocked": false,
+         "status": "Offline",
+         "bannedKeywords": [
+            "guns",
+            "drugs",
+            "porn",
+            "suicide",
+            "bomb"
+         ],
+         "callLogs": [],
+         "activityLogs": []
+      },
+      "SK-723084": {
+         "name": "Bacha 2",
+         "device": "Linking Pending...",
+         "parentMobile": "9876543210",
+         "childSocketId": null,
+         "isLocked": false,
+         "status": "Offline",
+         "bannedKeywords": [
+            "guns",
+            "drugs",
+            "porn",
+            "suicide",
+            "bomb"
+         ],
+         "callLogs": [],
+         "activityLogs": []
+      },
+      "SK-717261": {
+         "name": "Sana",
+         "device": "Linking Pending...",
+         "parentMobile": "9876543210",
+         "childSocketId": null,
+         "isLocked": true,
+         "status": "Pending",
+         "bannedKeywords": [
+            "guns",
+            "drugs",
+            "porn",
+            "suicide",
+            "bomb"
+         ],
+         "callLogs": [],
+         "activityLogs": []
+      }
+   }
+}
